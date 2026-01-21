@@ -5,7 +5,6 @@ Modify these values to experiment with different configurations.
 Uses Pydantic for type validation and better structure.
 """
 
-from typing import List
 from pydantic import BaseModel, Field
 
 
@@ -17,21 +16,31 @@ class Config(BaseModel):
     Modify the default values below to experiment with different settings.
     """
 
+    # -------------------------
     # Data settings
+    # -------------------------
     data_path: str = Field(
         default="data/dataset.parquet",
         description="Path to the dataset parquet file",
     )
 
-    # Model architecture
-    embedding_dim: int = Field(
+    # -------------------------
+    # Model settings (current hierarchical setup)
+    # -------------------------
+    chunk_hidden: int = Field(
+        default=128,
+        gt=0,
+        description="Hidden dimension of the chunk-level MLP encoder",
+    )
+    day_dim: int = Field(
+        default=128,
+        gt=0,
+        description="Dimension of the day/session embedding (and transformer model width)",
+    )
+    max_T_emb: int = Field(
         default=64,
         gt=0,
-        description="Dimension of learned embeddings",
-    )
-    hidden_dims: List[int] = Field(
-        default=[256, 128],
-        description="Hidden layer dimensions (can add more layers)",
+        description="Maximum sequence length for positional embeddings (max days/sessions per patient in a batch)",
     )
     dropout: float = Field(
         default=0.3,
@@ -40,19 +49,31 @@ class Config(BaseModel):
         description="Dropout probability for regularization",
     )
 
+
+    # -------------------------
+    # Session inference / temporal preprocessing
+    # -------------------------
+    gap_days: int = Field(
+        default=1,
+        ge=1,
+        description="Time gap (in days) to start a new inferred session/day",
+    )
+
+    # -------------------------
     # Training settings
+    # -------------------------
     batch_size: int = Field(
-        default=128,
+        default=14,
         gt=0,
-        description="Batch size for training",
+        description="Batch size (patients per batch) for training",
     )
     num_epochs: int = Field(
-        default=50,
+        default=30,
         gt=0,
         description="Number of training epochs per LOPO fold",
     )
     learning_rate: float = Field(
-        default=0.001,
+        default=1e-3,
         gt=0.0,
         description="Learning rate for optimizer",
     )
@@ -62,7 +83,9 @@ class Config(BaseModel):
         description="L2 regularization (0 = no regularization)",
     )
 
-    # Device settings
+    # -------------------------
+    # Device / reproducibility
+    # -------------------------
     use_cuda: bool = Field(
         default=True,
         description="Set to False to force CPU usage",
@@ -72,7 +95,9 @@ class Config(BaseModel):
         description="Random seed for reproducibility",
     )
 
-    # Evaluation settings
+    # -------------------------
+    # Evaluation / outputs
+    # -------------------------
     save_embeddings: bool = Field(
         default=True,
         description="Save embeddings after training",
@@ -86,7 +111,9 @@ class Config(BaseModel):
         description="Save model checkpoints (can be large)",
     )
 
-    # Advanced settings (for experimentation)
+    # -------------------------
+    # Advanced settings
+    # -------------------------
     use_class_weights: bool = Field(
         default=False,
         description="Balance classes in loss function",

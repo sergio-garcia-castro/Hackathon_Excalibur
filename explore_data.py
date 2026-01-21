@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 # Add src to path to import utils
 sys.path.insert(0, "src")
-from utils import extract_date_from_recording_id
+from src.utils import extract_date_from_recording_id
 
 
 def explore_dataset(data_path="data/dataset.parquet"):

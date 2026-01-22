@@ -37,6 +37,20 @@ class Config(BaseModel):
         gt=0,
         description="Dimension of the day/session embedding (and transformer model width)",
     )
+    n_layers: int = Field(
+        default=2,
+        gt=0,
+        description="Number of layers in the session transformer",
+    )
+    n_heads: int = Field(
+        default=4,
+        gt=0,
+        description="Number of attention heads in the session transformer",
+    )
+    d_ff: int = Field(
+        default=None,
+        description="Dimension of the feedforward network in the session transformer (None for default, and equal to day_dim * 4)",
+    )
     max_T_emb: int = Field(
         default=64,
         gt=0,

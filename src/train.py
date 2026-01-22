@@ -802,49 +802,49 @@ def train_lopo(
     labels = np.concatenate(all_test_labels) if len(all_test_labels) else np.zeros((0,), np.int64)
     patient_ids = np.concatenate(all_test_patient_ids) if len(all_test_patient_ids) else np.zeros((0,), dtype=object)
 
-    # You can decide which one is your "main" space; usually P_next is the clean predictive embedding.
+    # Main embeddings P_next is the clean predictive embedding.
     plot_embeddings_2d(
         P_next,
         labels,
         patient_ids,
         title=f"P_next (predict t→t+1) Embeddings (LOPO) - Mean AUC: {mean_auc:.4f}",
-        save_path=f"{save_path}embeddings_P_next.png",
+        save_path=f"{save_path}/embeddings_P_next.png",
     )
     plt.show()
 
-    # Additional plots (optional but requested)
+    # Additional embeddings plots
     plot_embeddings_2d(
         D_prev, labels, patient_ids,
         title="D_prev (content-only day_emb at t) - aligned to target (t+1)",
-        save_path=f"{save_path}embeddings_D_prev.png",
+        save_path=f"{save_path}/embeddings_D_prev.png",
     )
     plt.show()
 
     plot_embeddings_2d(
         D_next, labels, patient_ids,
         title="D_next (content-only day_emb at t+1) - target day content",
-        save_path=f"{save_path}embeddings_D_next.png",
+        save_path=f"{save_path}/embeddings_D_next.png",
     )
     plt.show()
 
     plot_embeddings_2d(
         E_prev, labels, patient_ids,
         title="E_prev (content+time input at t) - aligned to target (t+1)",
-        save_path=f"{save_path}embeddings_E_prev.png",
+        save_path=f"{save_path}/embeddings_E_prev.png",
     )
     plt.show()
 
     plot_embeddings_2d(
         E_next, labels, patient_ids,
         title="E_next (content+time input at t+1) - target day input",
-        save_path=f"{save_path}embeddings_E_next.png",
+        save_path=f"{save_path}/embeddings_E_next.png",
     )
     plt.show()
 
     plot_embeddings_2d(
         H_next, labels, patient_ids,
-        title="H_next (transformer state at t+1) - beware non-causal leakage",
-        save_path=f"{save_path}embeddings_H_next.png",
+        title="H_next (transformer state at t+1)",
+        save_path=f"{save_path}/embeddings_H_next.png",
     )
     plt.show()
 

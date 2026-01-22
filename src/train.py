@@ -277,6 +277,8 @@ def train_epoch(day_model, pos_emb, delta_emb, emb_model, next_day_head, classif
     delta_emb.train()
     emb_model.train()
     classifier.train()
+    next_day_head.train()
+
 
     total_loss = 0.0
     n = 0
@@ -611,6 +613,9 @@ def train_lopo(
     *,
     chunk_hidden: int = 128,
     day_dim: int = 128,
+    n_layers: int = 2,
+    n_heads: int = 4,
+    d_ff: int = None,
     gap_days: int = 1,
     max_T_emb: int = 50,
     dropout: float = 0.3,
@@ -699,7 +704,7 @@ def train_lopo(
 
         pos_emb = PositionalEmbedding(day_dim, max_len=max_T_emb).to(device)
         delta_emb = DeltaDaysEmbedding(day_dim).to(device)
-        emb_model = SessionTransformer(day_dim, n_heads=4, n_layers=2, d_ff=None, dropout=dropout).to(device)
+        emb_model = SessionTransformer(day_dim, n_heads=n_heads, n_layers=n_layers, d_ff=d_ff, dropout=dropout).to(device)
 
         next_day_head = nn.Linear(day_dim, day_dim).to(device)
         classifier = LinearClassifierHead(embedding_dim=day_dim, num_classes=2).to(device)
@@ -881,6 +886,9 @@ def main():
         feature_cols=feature_cols,
         chunk_hidden=config.chunk_hidden,
         day_dim=config.day_dim,
+        n_layers=config.n_layers,
+        n_heads=config.n_heads,
+        d_ff=config.d_ff,
         gap_days=config.gap_days,
         max_T_emb=config.max_T_emb,
         dropout=config.dropout,

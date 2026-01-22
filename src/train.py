@@ -27,7 +27,6 @@ from utils import (
     plot_embeddings_2d,
     print_evaluation_results,
     compute_random_baseline,
-    extract_date_from_recording_id,
 )
 from config import get_config
 from collections import defaultdict
@@ -50,7 +49,6 @@ def infer_sessions(df: pd.DataFrame,
     Assumes time_col is numeric seconds OR pandas datetime.
     """
     df = df.copy()
-    df[time_col] = df["recording_id"].apply(extract_date_from_recording_id)
     df = df.sort_values([patient_col, time_col])
   
     prev = df.groupby(patient_col)[time_col].shift(1)
@@ -96,7 +94,11 @@ def build_session_table(df: pd.DataFrame,
 
     # chunk indices for sampling
     # We use the dataframe row index as a stable pointer into features
-    chunk_lists = grp.apply(lambda g: g.index.values).reset_index(name="chunk_indices")
+    # chunk_lists = grp.apply(lambda g: g.index.values).reset_index(name="chunk_indices")
+    chunk_lists = (
+        grp.apply(lambda g: g.index.values, include_groups=False)
+        .reset_index(name="chunk_indices")
+    )
     sessions = sessions.merge(chunk_lists, on=[patient_col, "session_id"], how="left")
 
     # session delta days per patient
@@ -588,8 +590,14 @@ def load_df(data_path: str):
     df[feature_cols] = df[feature_cols].fillna(0.0)
 
     # Add date to df
-    df["date"] = df["recording_id"].apply(extract_date_from_recording_id)
+    df = df.assign(
+        date=pd.to_datetime(
+            df["recording_id"].str.split("/", n=1).str[1],
+            format="%Y-%m-%d",
+        )
+    )
 
+    df = df.copy() # Defragmentation warning fix
     return df, feature_cols
 
 
